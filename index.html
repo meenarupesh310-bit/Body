@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gains Tracker | Pro Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0B1120; color: #F8FAFC; }
+        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); gap: 8px; }
+        .day-box { width: 100%; aspect-ratio: 1; border-radius: 6px; background: #1E293B; transition: all 0.4s ease; border: 1px solid #334155; }
+        .day-box.success { background: #10B981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); border-color: #059669; }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .stepper-btn { background: #334155; border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; user-select: none; }
+        .stepper-btn:active { transform: scale(0.9); background: #475569; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 pb-20">
+
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Dashboard Header -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Daily Gains Pro</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Calories -->
+                <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800">
+                    <div class="flex justify-between items-end mb-3">
+                        <span class="text-gray-400 font-semibold uppercase tracking-wider text-sm">Calories</span>
+                        <span class="text-xl font-bold text-white"><span id="cal-count" class="text-cyan-400 text-3xl">0</span> / 3000</span>
+                    </div>
+                    <div class="w-full bg-gray-800 rounded-full h-3">
+                        <div id="cal-bar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Protein -->
+                <div class="bg-gray-900/50 p-4 rounded-2xl border border-gray-800">
+                    <div class="flex justify-between items-end mb-3">
+                        <span class="text-gray-400 font-semibold uppercase tracking-wider text-sm">Protein</span>
+                        <span class="text-xl font-bold text-white"><span id="pro-count" class="text-emerald-400 text-3xl">0</span> / 100g</span>
+                    </div>
+                    <div class="w-full bg-gray-800 rounded-full h-3">
+                        <div id="pro-bar" class="bg-gradient-to-r from-emerald-500 to-green-400 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meals Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Morning -->
+            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-blue-500">
+                <h2 class="text-xl font-bold mb-5 flex items-center gap-2">🌅 Morning <span class="text-sm font-normal text-gray-400">(9:00 AM)</span></h2>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Milk (ml)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('m-milk', -100, 0)">-</div>
+                            <input type="number" id="m-milk" value="1000" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('m-milk', 100, 2000)">+</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Banana (pcs)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('m-banana', -1, 0)">-</div>
+                            <input type="number" id="m-banana" value="2" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('m-banana', 1, 10)">+</div>
+                        </div>
+                    </div>
+                    <button onclick="saveMeal('morning')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-500/30">Save Morning</button>
+                </div>
+            </div>
+
+            <!-- Afternoon -->
+            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-orange-500">
+                <h2 class="text-xl font-bold mb-5 flex items-center gap-2">☀️ Afternoon <span class="text-sm font-normal text-gray-400">(12:00 PM)</span></h2>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Roti (pcs)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('a-roti', -1, 0)">-</div>
+                            <input type="number" id="a-roti" value="3" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('a-roti', 1, 20)">+</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Ghee (spoon)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('a-ghee', -1, 0)">-</div>
+                            <input type="number" id="a-ghee" value="1" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('a-ghee', 1, 10)">+</div>
+                        </div>
+                    </div>
+                    <button onclick="saveMeal('afternoon')" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-orange-500/30">Save Afternoon</button>
+                </div>
+            </div>
+
+            <!-- Evening -->
+            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-purple-500">
+                <h2 class="text-xl font-bold mb-5 flex items-center gap-2">🌇 Evening <span class="text-sm font-normal text-gray-400">(7:00 PM)</span></h2>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Milk (ml)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('e-milk', -100, 0)">-</div>
+                            <input type="number" id="e-milk" value="1000" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('e-milk', 100, 2000)">+</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Banana (pcs)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('e-banana', -1, 0)">-</div>
+                            <input type="number" id="e-banana" value="2" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('e-banana', 1, 10)">+</div>
+                        </div>
+                    </div>
+                    <button onclick="saveMeal('evening')" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-purple-500/30">Save Evening</button>
+                </div>
+            </div>
+
+            <!-- Night -->
+            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-indigo-500">
+                <h2 class="text-xl font-bold mb-5 flex items-center gap-2">🌙 Night <span class="text-sm font-normal text-gray-400">(9:30 PM)</span></h2>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Roti (pcs)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('n-roti', -1, 0)">-</div>
+                            <input type="number" id="n-roti" value="3" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('n-roti', 1, 20)">+</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl">
+                        <span class="text-gray-200 font-medium">Ghee (spoon)</span>
+                        <div class="flex items-center space-x-3">
+                            <div class="stepper-btn" onclick="updateVal('n-ghee', -1, 0)">-</div>
+                            <input type="number" id="n-ghee" value="1" class="w-16 bg-transparent text-center font-bold text-lg focus:outline-none" readonly>
+                            <div class="stepper-btn" onclick="updateVal('n-ghee', 1, 10)">+</div>
+                        </div>
+                    </div>
+                    <button onclick="saveMeal('night')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-indigo-500/30">Save Night</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Calendar -->
+        <div class="glass-card rounded-3xl p-6 md:p-8 mt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">90 Days Streak 🔥</h2>
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-semibold border border-emerald-500/30">Goal: 3000 kcal</span>
+            </div>
+            <div id="calendar" class="calendar-grid">
+                <!-- Javascript auto generates boxes -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TARGET_CALORIES = 3000;
+        const TARGET_PROTEIN = 100;
+        
+        const NUTRITION = {
+            milk: { cal: 0.725, pro: 0.028 }, 
+            banana: { cal: 100, pro: 1 },     
+            roti: { cal: 100, pro: 3 },       
+            ghee: { cal: 90, pro: 0 }         
+        };
+
+        const today = new Date().toISOString().split('T')[0];
+        let dailyData = JSON.parse(localStorage.getItem('gainsData')) || {};
+        
+        if (!dailyData[today]) {
+            dailyData[today] = { cal: 0, pro: 0, inputs: {} };
+        }
+
+        // Stepper Button Logic
+        function updateVal(id, change, min) {
+            const input = document.getElementById(id);
+            let currentVal = parseInt(input.value) || 0;
+            let newVal = currentVal + change;
+            if(newVal >= min) {
+                input.value = newVal;
+            }
+        }
+
+        function saveMeal(mealType) {
+            let cal = 0, pro = 0;
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Saved! ✔️";
+            btn.classList.add("bg-green-500");
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove("bg-green-500");
+            }, 1500);
+
+            if (mealType === 'morning' || mealType === 'evening') {
+                const prefix = mealType === 'morning' ? 'm' : 'e';
+                const milkVal = parseFloat(document.getElementById(`${prefix}-milk`).value) || 0;
+                const bananaVal = parseFloat(document.getElementById(`${prefix}-banana`).value) || 0;
+                
+                dailyData[today].inputs[`${prefix}-milk`] = milkVal;
+                dailyData[today].inputs[`${prefix}-banana`] = bananaVal;
+            } 
+            else if (mealType === 'afternoon' || mealType === 'night') {
+                const prefix = mealType === 'afternoon' ? 'a' : 'n';
+                const rotiVal = parseFloat(document.getElementById(`${prefix}-roti`).value) || 0;
+                const gheeVal = parseFloat(document.getElementById(`${prefix}-ghee`).value) || 0;
+
+                dailyData[today].inputs[`${prefix}-roti`] = rotiVal;
+                dailyData[today].inputs[`${prefix}-ghee`] = gheeVal;
+            }
+
+            recalculateDailyTotal();
+        }
+
+        function recalculateDailyTotal() {
+            let totalCal = 0, totalPro = 0;
+            const inputs = dailyData[today].inputs;
+            
+            if(inputs['m-milk']) { totalCal += inputs['m-milk'] * NUTRITION.milk.cal; totalPro += inputs['m-milk'] * NUTRITION.milk.pro; }
+            if(inputs['m-banana']) { totalCal += inputs['m-banana'] * NUTRITION.banana.cal; totalPro += inputs['m-banana'] * NUTRITION.banana.pro; }
+            
+            if(inputs['a-roti']) { totalCal += inputs['a-roti'] * NUTRITION.roti.cal; totalPro += inputs['a-roti'] * NUTRITION.roti.pro; }
+            if(inputs['a-ghee']) { totalCal += inputs['a-ghee'] * NUTRITION.ghee.cal; totalPro += inputs['a-ghee'] * NUTRITION.ghee.pro; }
+            
+            if(inputs['e-milk']) { totalCal += inputs['e-milk'] * NUTRITION.milk.cal; totalPro += inputs['e-milk'] * NUTRITION.milk.pro; }
+            if(inputs['e-banana']) { totalCal += inputs['e-banana'] * NUTRITION.banana.cal; totalPro += inputs['e-banana'] * NUTRITION.banana.pro; }
+            
+            if(inputs['n-roti']) { totalCal += inputs['n-roti'] * NUTRITION.roti.cal; totalPro += inputs['n-roti'] * NUTRITION.roti.pro; }
+            if(inputs['n-ghee']) { totalCal += inputs['n-ghee'] * NUTRITION.ghee.cal; totalPro += inputs['n-ghee'] * NUTRITION.ghee.pro; }
+
+            dailyData[today].cal = totalCal;
+            dailyData[today].pro = totalPro;
+            localStorage.setItem('gainsData', JSON.stringify(dailyData));
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const currentCal = dailyData[today].cal;
+            const currentPro = dailyData[today].pro;
+
+            document.getElementById('cal-count').innerText = Math.round(currentCal);
+            document.getElementById('pro-count').innerText = Math.round(currentPro);
+
+            const calPercent = Math.min((currentCal / TARGET_CALORIES) * 100, 100);
+            const proPercent = Math.min((currentPro / TARGET_PROTEIN) * 100, 100);
+
+            document.getElementById('cal-bar').style.width = calPercent + '%';
+            document.getElementById('pro-bar').style.width = proPercent + '%';
+
+            const inputs = dailyData[today].inputs;
+            for(let key in inputs) {
+                if(document.getElementById(key) && inputs[key] !== undefined) {
+                    document.getElementById(key).value = inputs[key];
+                }
+            }
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const calContainer = document.getElementById('calendar');
+            calContainer.innerHTML = '';
+            
+            for(let i = 0; i < 90; i++) {
+                let boxDate = new Date();
+                boxDate.setDate(boxDate.getDate() - (89 - i));
+                let dateStr = boxDate.toISOString().split('T')[0];
+                
+                let box = document.createElement('div');
+                box.className = 'day-box';
+                box.title = dateStr;
+                
+                if (dailyData[dateStr] && dailyData[dateStr].cal >= TARGET_CALORIES) {
+                    box.classList.add('success');
+                }
+                
+                calContainer.appendChild(box);
+            }
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
